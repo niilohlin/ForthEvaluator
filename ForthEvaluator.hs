@@ -24,10 +24,18 @@ evalNativeFunc a stack = undefined
 eval :: ProgramState -> Either String ProgramStack
 eval program = undefined
 
+getDefinition :: Dict -> String -> Either String ProgramUnit
+getDefinition dict key = case (Map.lookup key dict) of
+                            Just expr -> Right expr
+                            Nothing -> Left $ "Word " ++ key ++ " not defined"
+
 evalOneStep :: ProgramState -> Either String ProgramState
 evalOneStep p@ProgramState{programStack = [] } = Right p
 evalOneStep p@ProgramState{programStack = ((Native n):prog)}  = evalNativeFunc n p
-evalOneStep p@ProgramState{programStack = ((Word word):prog) } = undefined
+evalOneStep p@ProgramState{programStack = ((Word word):prog) , dict = d } = getDefinition d word >>= \programUnit -> Right $ p { programStack = (programUnit:prog) }
 evalOneStep p@ProgramState{programStack = (a:prog), dataStack = d }= Right $ p { programStack = prog, dataStack = (a:d) }
 
+
+exampleProgram =  [(Word "x"), (ForthInt 5), (ForthInt 4), Native Plus]
+exapmleProgramState = ProgramState exampleProgram [] (Map.fromList [("x", ForthInt 6 )])
 
