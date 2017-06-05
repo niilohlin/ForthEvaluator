@@ -19,13 +19,14 @@ evalNativeFunc :: NativeFunc -> ProgramState -> Either String ProgramState
 evalNativeFunc Drop (ProgramState {dataStack = []}) = Left "error, cannot drop from empty stack"
 evalNativeFunc Drop (p@(ProgramState {dataStack = (_:a)})) = Right $ p { dataStack = a }
 evalNativeFunc Plus p@(ProgramState { dataStack = ((ForthInt a):(ForthInt b):c)}) = Right $ p { dataStack = (ForthInt (a + b)):c }
-evalNativeFunc Plus a = Left ("error, cannot add " ++ show a)
+evalNativeFunc Plus a = Left $ "error, cannot add " ++ show a
+evalNativeFunc Eval p@ProgramState { programStack = prog, dataStack = ((ForthLambda l):datast) } = Right $ p { programStack = l ++ prog, dataStack = datast }
+evalNativeFunc Eval p = Left $ "error cannot eval non lambda: " ++ show p
 evalNativeFunc Define p@ProgramState {
     dataStack = ((Symbol symbolName):definition:rest),
     dict = oldDict
     } = let newDict = Map.insert symbolName definition oldDict in Right $ p {dataStack = rest, dict = newDict}
 evalNativeFunc Define p = Left "cannot define"
-evalNativeFunc Eval (p@ProgramState { dataStack = (ForthLambda lambda):prog }) = undefined
 evalNativeFunc a stack = undefined
 
 eval :: ProgramState -> Either String ProgramState

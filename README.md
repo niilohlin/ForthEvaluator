@@ -27,12 +27,13 @@ x // Word
 
 # Other Syntax
 ```
+5 stack // (5)
 5 (2 +) eval // 7
-"string" (1 2) (+) apply // "string" (3)
-(1 2) (3) apply // (3 1 2)
-(1 2) (drop) apply // (2)
+"string" (1 2) (+) push // "string" (1 2 (+))
+(1 2) (3) cons // (1 2 3)
+(1 2) (drop) cons // (1 2 drop)
 (1 2) drop // -> empty
-1 5 apply // -> (1 5)
+1 5 cons // -> (1 . 5)
 (3 4) eval // -> 3 4
 ```
 
