@@ -21,9 +21,22 @@ x // Word
 
 "Hello world" print // print 'hello world'
 
-(2 *) // add the 'lambda' (2 *) to the stack. 
+(2 *) // add the 'lambda' (2 *) to the stack.
 
 ```
+
+# Other Syntax
+```
+5 (2 +) eval // 7
+"string" (1 2) (+) apply // "string" (3)
+(1 2) (3) apply // (3 1 2)
+(1 2) (drop) apply // (2)
+(1 2) drop // -> empty
+1 5 apply // -> (1 5)
+(3 4) eval // -> 3 4
+```
+
+So `1 5 (+) eval` is equal to `1 5 +`. And `apply` executes the stack on the next stack item
 
 # Concept
 The language has two paralell stacks. One "data stack" and one "program stack". When the program is parsed. The entire program is added
