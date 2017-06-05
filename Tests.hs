@@ -19,4 +19,9 @@ test1 = TestCase . assert $ [ForthInt 5, ForthInt 4, Native Plus]  `evaluatesTo`
 
 test2 = TestCase . assert $ [ForthInt 5, Symbol "x"]  `evaluatesTo` [Symbol "x", ForthInt 5]
 
-tests = TestList [TestLabel "test1" test1, TestLabel "test2" test2]
+test3 = TestCase . assert $ [ForthInt 5, Symbol "x", Native Define, Word "x"]  `evaluatesTo` [ForthInt 5]
+
+tests = TestList [TestLabel "test1" test1
+                 ,TestLabel "test2" test2
+                 ,TestLabel "test3" test3
+                 ]
