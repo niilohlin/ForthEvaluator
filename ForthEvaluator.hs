@@ -1,15 +1,16 @@
 
+module ForthEvaluator where
 import Prelude
 import qualified Data.Map as Map
 
-data NativeFunc = Drop | Plus | Apply | Define deriving (Show)
+data NativeFunc = Drop | Plus | Apply | Eval | Define deriving (Show, Eq)
 
-data ProgramUnit = Word String | Symbol String | Native NativeFunc | ForthInt Int | ForthString String | ForthLambda [ProgramUnit] deriving (Show)
+data ProgramUnit = Word String | Symbol String | Native NativeFunc | ForthInt Int | ForthString String | ForthLambda [ProgramUnit] deriving (Show, Eq)
 
 type ProgramStack = [ProgramUnit]
 type Dict = (Map.Map String ProgramUnit)
 
-data ProgramState = ProgramState { programStack :: ProgramStack, dataStack :: ProgramStack, dict :: Dict } deriving (Show)
+data ProgramState = ProgramState { programStack :: ProgramStack, dataStack :: ProgramStack, dict :: Dict } deriving (Show, Eq)
 
 parse :: String -> Either String ProgramState
 parse = undefined
@@ -24,10 +25,13 @@ evalNativeFunc Define p@ProgramState {
     dict = oldDict
     } = let newDict = Map.insert symbolName definition oldDict in Right $ p {dataStack = rest, dict = newDict}
 evalNativeFunc Define p = Left "cannot define"
+evalNativeFunc Eval (p@ProgramState { dataStack = (ForthLambda lambda):prog }) = undefined
 evalNativeFunc a stack = undefined
 
-eval :: ProgramState -> Either String ProgramStack
-eval program = undefined
+eval :: ProgramState -> Either String ProgramState
+eval program = if null . programStack $ program
+    then Right program
+    else evalOneStep program >>= eval
 
 getDefinition :: Dict -> String -> Either String ProgramUnit
 getDefinition dict key = case (Map.lookup key dict) of
@@ -41,6 +45,5 @@ evalOneStep p@ProgramState { programStack = ((Word word):prog) , dict = d } = ge
 evalOneStep p@ProgramState { programStack = (a:prog), dataStack = d }= Right $ p { programStack = prog, dataStack = (a:d) }
 
 
-exampleProgram =  [(ForthInt 5), (Symbol "y"), (Native Define), (Word "y")]
-exapmleProgramState = ProgramState exampleProgram [] (Map.fromList [("x", ForthInt 6 )])
+exampleProgramState = ProgramState [(ForthInt 5), (Symbol "y"), (Native Define), (Word "y")] [] (Map.fromList [("x", ForthInt 6 )])
 
