@@ -6,10 +6,17 @@ import Prelude
 import ForthEvaluator
 import qualified Data.Map as Map
 
-test1 = TestCase (assertEqual "'5 4 +' is 9" [ForthInt 9] (getData . eval $ pState))
-    where
-        pState = ProgramState [(ForthInt 5), (ForthInt 4), (Native Plus)] [] (Map.fromList [])
-        getData (Right (ProgramState { dataStack = d })) = d
-        getData (Left _) = []
 
-tests = TestList [TestLabel "test1" test1]
+evaluatesTo :: ProgramStack -> ProgramStack -> Bool
+evaluatesTo input output = getDataStack (eval pState) == Just output
+    where
+        pState = ProgramState input [] (Map.fromList [])
+        getDataStack (Right (ProgramState { dataStack = d })) = Just d
+        getDataStack (Left _) = Nothing
+
+
+test1 = TestCase . assert $ [ForthInt 5, ForthInt 4, Native Plus]  `evaluatesTo` [ForthInt 9]
+
+test2 = TestCase . assert $ [ForthInt 5, Symbol "x"]  `evaluatesTo` [Symbol "x", ForthInt 5]
+
+tests = TestList [TestLabel "test1" test1, TestLabel "test2" test2]
